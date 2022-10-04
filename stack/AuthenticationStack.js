@@ -12,7 +12,7 @@ export default function AuthenticationStack() {
   return (
     <NavigationContainer>
       <AuthStack.Navigator
-        initialRouteName="Form"
+        initialRouteName="GettingStarted"
         screenOptions={{ headerShown: false }}
       >
         <AuthStack.Screen name="GettingStarted" component={GettingStarted} />

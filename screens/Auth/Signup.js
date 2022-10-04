@@ -4,7 +4,10 @@ import Button from "../../components/Button";
 import { AntDesign } from "@expo/vector-icons";
 import ButtonSecondary from "../../components/ButtonSecondary";
 
-export default function Signup() {
+export default function Signup({ navigation }) {
+  const onSignupWithEmail = () => {
+    navigation.navigate("Form");
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -17,7 +20,7 @@ export default function Signup() {
       <View style={{ marginHorizontal: 10 }}>
         <Text style={styles.header}>Sign up to continue</Text>
       </View>
-      <Button title="Signup with email" />
+      <Button title="Signup with email" onPress={onSignupWithEmail} />
       <View style={{ marginTop: 10 }}>
         <ButtonSecondary title="Signup with phone" />
       </View>

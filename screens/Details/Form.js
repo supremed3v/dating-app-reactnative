@@ -1,6 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import React, { useState } from "react";
 import Button from "../../components/Button";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Bio,
   IamA,
@@ -89,19 +90,39 @@ export default function Form() {
             fontWeight: "bold",
             fontSize: 34,
             marginLeft: 24,
+            marginTop: 40,
           }}
         >
           {FormTitles[screen]}
         </Text>
       </View>
       <View>{FormComponents()}</View>
-      <View style={{ top: 350, left: 50 }}>
+      <View style={{ top: 350, left: 70 }}>
         <Button
           title={screen === FormTitles.length - 1 ? "Finish" : "Continue"}
           onPress={onHandleNext}
         />
-        {screen === 0 ? null : <Button title="Back" onPress={onHandlePrev} />}
       </View>
+      {screen === 0 ? null : (
+        <Pressable
+          style={{
+            width: 50,
+            height: 50,
+            backgroundColor: "#fefefe",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 15,
+            position: "absolute",
+            top: -20,
+            left: 20,
+            borderWidth: 1,
+            borderColor: "#E8E6EA",
+          }}
+          onPress={onHandlePrev}
+        >
+          <Ionicons name="chevron-back" size={24} color="#E94057" />
+        </Pressable>
+      )}
     </View>
   );
 }

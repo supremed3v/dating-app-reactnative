@@ -1,12 +1,20 @@
-import { View, Text, Pressable, Image, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  TextInput,
+  Platform,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { Entypo } from "@expo/vector-icons";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function ProfileDetails() {
   const [isPickerShow, setIsPickerShow] = useState(false);
   const [image, setImage] = useState(null);
+  const [date, setDate] = useState(new Date(Date.now()));
   const [uploading, setUploading] = useState();
   const [borderColor, setBorderColor] = useState("#e8e6ea");
 
@@ -24,6 +32,19 @@ export default function ProfileDetails() {
       setImage(result.uri);
     }
   };
+
+  const showPicker = () => {
+    setIsPickerShow(true);
+  };
+
+  const onChange = (event, value) => {
+    setDate(value);
+    console.log(value);
+    if (Platform.OS === "android") {
+      setIsPickerShow(false);
+    }
+  };
+
   return (
     <View
       style={{
@@ -78,7 +99,7 @@ export default function ProfileDetails() {
             paddingTop: 10,
             paddingBottom: 10,
             paddingLeft: 20,
-            borderRadius: 5,
+            borderRadius: 10,
             fontSize: 16,
           }}
         />
@@ -93,11 +114,43 @@ export default function ProfileDetails() {
             paddingTop: 10,
             paddingBottom: 10,
             paddingLeft: 20,
-            borderRadius: 5,
+            borderRadius: 10,
             fontSize: 16,
             marginTop: 10,
           }}
         />
+        {!isPickerShow && (
+          <Pressable
+            style={{
+              width: 280,
+              backgroundColor: "#ffe0e5",
+              alignItems: "center",
+              // opacity: 0.1,
+              height: 50,
+              borderRadius: 10,
+              marginTop: 10,
+              flexDirection: "row",
+            }}
+            onPress={showPicker}
+          >
+            <FontAwesome5
+              name="calendar-alt"
+              size={24}
+              color="#f6697d"
+              style={{ marginRight: 14, paddingLeft: 15 }}
+            />
+            <Text style={{ color: "#E94057" }}>Choose birthday date</Text>
+          </Pressable>
+        )}
+        {isPickerShow && (
+          <DateTimePicker
+            value={date}
+            mode={"date"}
+            display="default"
+            onChange={onChange}
+            is24Hour={true}
+          />
+        )}
       </View>
     </View>
   );

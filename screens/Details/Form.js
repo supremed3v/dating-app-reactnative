@@ -89,7 +89,7 @@ export default function Form() {
             textAlign: "left",
             fontWeight: "bold",
             fontSize: 34,
-            marginLeft: 24,
+            marginLeft: 50,
             marginTop: 40,
           }}
         >
@@ -97,7 +97,7 @@ export default function Form() {
         </Text>
       </View>
       <View>{FormComponents()}</View>
-      <View style={{ top: 350, left: 70 }}>
+      <View style={{ bottom: 50, left: 70, position: "absolute" }}>
         <Button
           title={screen === FormTitles.length - 1 ? "Finish" : "Continue"}
           onPress={onHandleNext}

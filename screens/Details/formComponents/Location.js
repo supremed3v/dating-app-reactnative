@@ -1,6 +1,7 @@
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
+import { Feather } from "@expo/vector-icons";
 export default function Locate() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -14,8 +15,7 @@ export default function Locate() {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      setLocation(location.coords.latitude, location.coords.longitude);
-      console.log(location.coords.latitude, location.coords.longitude);
+      setLocation(location);
     })();
   }, []);
 
@@ -23,11 +23,42 @@ export default function Locate() {
   if (errorMsg) {
     text = errorMsg;
   } else if (location) {
-    text = "Thank you!";
+    text = "Thank you! Your location has been saved.";
   }
   return (
-    <View>
-      <Text>{text}</Text>
+    <View style={{ width: 400, height: 400 }}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 65,
+        }}
+      >
+        {text == "Waiting.." ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 60,
+              marginLeft: -30,
+            }}
+          >
+            <Feather name="check-circle" size={50} color="#f6697d" />
+            <Text
+              style={{
+                color: "#000",
+                fontSize: 32,
+                textAlign: "center",
+                width: 300,
+              }}
+            >
+              {text}
+            </Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }

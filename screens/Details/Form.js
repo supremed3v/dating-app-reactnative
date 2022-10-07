@@ -6,11 +6,11 @@ import {
   Bio,
   IamA,
   Interests,
-  Location,
   LookingFor,
   MyPhotos,
   ProfileDetails,
 } from "./formComponents";
+import Locate from "./formComponents/Location";
 export default function Form() {
   const [form, setForm] = useState({
     // Profile Details
@@ -57,7 +57,7 @@ export default function Form() {
     } else if (screen === 3) {
       return <Interests form={form} setForm={setForm} />;
     } else if (screen === 4) {
-      return <Location form={form} setForm={setForm} />;
+      return <Locate form={form} setForm={setForm} />;
     } else if (screen === 5) {
       return <Bio form={form} setForm={setForm} />;
     } else {

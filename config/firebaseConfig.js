@@ -1,5 +1,10 @@
 import Constants from "expo-constants";
-export default {
+
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+
+var firebaseCon = {
   apiKey: Constants.manifest?.extra?.firebaseApiKey,
   authDomain: Constants.manifest?.extra?.firebaseAuthDomain,
   projectId: Constants.manifest?.extra?.firebaseProjectId,
@@ -8,3 +13,7 @@ export default {
   appId: Constants.manifest?.extra?.firebaseAppId,
   measurementId: Constants.manifest?.extra?.firebaseMeasurementId,
 };
+// Initialize Firebase
+firebase.initializeApp(firebaseCon);
+
+export default firebase;

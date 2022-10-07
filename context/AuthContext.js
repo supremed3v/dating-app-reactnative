@@ -1,16 +1,28 @@
-import React, { createContext } from "react";
+import React, { useEffect, useState, createContext } from "react";
 
-import Firebase from "../config/firebase";
+import firebase from "../config/firebaseConfig";
 
-const FirebaseContext = createContext({});
+export const AuthContext = createContext({
+  user: null,
+  loading: true,
+});
 
-export const FirebaseProvider = FirebaseContext.Provider;
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-export const FirebaseConsumer = FirebaseContext.Consumer;
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
+    });
 
-export const withFirebaseHOC = (Component) => (props) =>
-  (
-    <FirebaseConsumer>
-      {(state) => <Component {...props} firebase={state} />}
-    </FirebaseConsumer>
+    return unsubscribe;
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, loading }}>
+      {children}
+    </AuthContext.Provider>
   );
+};

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   MaterialIcons,
   Foundation,
@@ -8,7 +8,7 @@ import {
   Entypo,
 } from "@expo/vector-icons";
 
-export default function Interests() {
+export default function Interests({ form, setForm }) {
   const [interest, setInterest] = useState([]);
   const options = [
     {
@@ -52,8 +52,9 @@ export default function Interests() {
       return;
     }
     setInterest((interest) => interest.concat(selectedInterest));
+    setForm({ ...form, hobbies: interest });
   }
-  console.log(interest);
+  console.log(form);
 
   return (
     <View style={{ width: 400, height: 100 }}>

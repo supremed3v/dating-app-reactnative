@@ -1,48 +1,104 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import DropDownPicker from "react-native-dropdown-picker";
 
-export default function LookingFor() {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
+export default function LookingFor({ form, setForm }) {
+  const [userOption, setUserOption] = useState(null);
+  const genders = [
     {
-      label: "Male",
-      value: "males",
+      id: 1,
+      value: "Male",
     },
     {
-      label: "Female",
-      value: "females",
+      id: 2,
+      value: "Female",
     },
-    ,
-  ]);
+  ];
+  const selectHandler = (value) => {
+    setUserOption(value);
+    setForm({ ...form, sexInterest: value });
+  };
   return (
     <View
       style={{
-        backgroundColor: "#171717",
-        flex: 1,
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 15,
         marginTop: 100,
       }}
     >
-      <DropDownPicker
-        placeholder="You are looking for?"
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-        style={{ backgroundColor: "#f6697d", borderColor: "#E8E6EA" }}
-        textStyle={{ color: "#fff" }}
-        labelStyle={{ color: "white", textAlign: "center", fontSize: 20 }}
-        placeholderStyle={{ color: "white", textAlign: "center" }}
-        dropDownContainerStyle={{
-          backgroundColor: "#f6697d",
-        }}
-      />
+      {genders.map((g) => (
+        <View key={g.value}>
+          <Pressable
+            style={
+              g.value === userOption
+                ? styles.containerSecondary
+                : styles.container
+            }
+            onPress={() => selectHandler(g.value)}
+          >
+            <Text
+              style={
+                g.value === userOption
+                  ? styles.buttonTextSecondary
+                  : styles.buttonText
+              }
+            >
+              {g.value}
+            </Text>
+          </Pressable>
+        </View>
+      ))}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  containerSecondary: {
+    width: 150,
+    backgroundColor: "#f6697d",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderRadius: 15,
+    marginBottom: 10,
+    marginHorizontal: 5,
+    flexDirection: "row",
+    paddingLeft: 10,
+    elevation: 20,
+    shadowColor: "black",
+  },
+  buttonTextSecondary: {
+    fontSize: 16,
+    paddingVertical: 17,
+    color: "white",
+    fontWeight: "500",
+    textAlign: "center",
+    marginLeft: 10,
+  },
+
+  container: {
+    width: 150,
+    backgroundColor: "#FFF",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderRadius: 15,
+    borderColor: "#f3f3f3",
+    marginHorizontal: 5,
+    marginBottom: 10,
+    flexDirection: "row",
+    paddingLeft: 10,
+
+    elevation: 20,
+    shadowColor: "black",
+  },
+  buttonText: {
+    fontSize: 16,
+    paddingVertical: 17,
+    color: "#f6697d",
+    fontWeight: "500",
+    textAlign: "center",
+    marginLeft: 10,
+
+    elevation: 20,
+    shadowColor: "black",
+  },
+});

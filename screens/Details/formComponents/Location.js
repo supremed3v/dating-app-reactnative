@@ -2,8 +2,8 @@ import { View, Text, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
-export default function Locate() {
-  const [location, setLocation] = useState(null);
+export default function Locate({ form, setForm }) {
+  const [loc, setLoc] = useState({});
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
@@ -14,15 +14,17 @@ export default function Locate() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let myLocation = await Location.getCurrentPositionAsync({});
+      setLoc(myLocation);
+      console.log(loc);
+      setForm({ ...form, location: { loc } });
     })();
   }, []);
-
+  console.log(form);
   let text = "Waiting..";
   if (errorMsg) {
     text = errorMsg;
-  } else if (location) {
+  } else if (loc) {
     text = "Thank you! Your location has been saved.";
   }
   return (

@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import AuthenticationStack from "./stack/AuthenticationStack";
 import { AuthProvider } from "./context/AuthContext";
+import MainStackNavigator from "./stack/AuthenticationStack";
 
 export default function App() {
   return (
     <>
       <AuthProvider>
-        <AuthenticationStack />
+        <MainStackNavigator />
         <StatusBar style="auto" />
       </AuthProvider>
     </>

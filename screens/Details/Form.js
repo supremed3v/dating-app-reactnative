@@ -1,24 +1,22 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Button from "../../components/Button";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Bio,
-  IamA,
-  Interests,
-  LookingFor,
-  MyPhotos,
-  ProfileDetails,
-} from "./formComponents";
-import Locate from "./formComponents/Location";
-export default function Form() {
-  const [form, setForm] = useState({
-    // Profile Details
-    age: "",
-    avatar: "",
-    first_name: "",
-    last_name: "",
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc, onSnapshot } from "firebase/firestore";
+import { ref, onValue, push, update, remove } from "firebase/database";
 
+import { Bio, IamA, Interests, LookingFor } from "./formComponents";
+import Locate from "./formComponents/Location";
+import EmailAndPassword from "./formComponents/EmailAndPassword";
+import { AuthContext } from "../../context/AuthContext";
+
+export default function Form({ navigation }) {
+  const [screen, setScreens] = useState(0);
+  const { user } = useContext(AuthContext);
+  const auth = getAuth();
+  const db = getFirestore();
+  const [form, setForm] = useState({
     // I am a
     gender: "",
 
@@ -31,25 +29,69 @@ export default function Form() {
     // Bio
     description: "",
 
-    //My Photos
-
-    photos: [],
+    location: null,
   });
-  const [screen, setScreens] = useState(0);
+  const [authForm, setAuthForm] = useState({
+    displayName: "",
+    email: "",
+    password: "",
+    error: "",
+    age: "",
+  });
 
+  if (user) {
+    screen === 1;
+  }
   const FormTitles = [
-    "Profile details",
-    "I am a",
-    "I am looking for",
-    "My interests",
-    "My location",
-    "My bio",
-    "My photos",
+    "Sign Up",
+    "Your gender",
+    "Looking for?",
+    "Your interests",
+    "Your bio",
+    "Your location",
   ];
+
+  async function onSignUp() {
+    if (authForm.email === "" || authForm.password === "") {
+      setAuthForm({
+        ...authForm,
+        error: "Email and password is required to go through.",
+      });
+      return;
+    }
+    try {
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        authForm.email,
+        authForm.password
+      );
+      try {
+        await setDoc(doc(db, "users", res.user.uid), {
+          uid: res.user.uid,
+          displayName: authForm.displayName,
+          email: authForm.email,
+          age: authForm.age,
+        });
+      } catch (error) {
+        setAuthForm({
+          ...authForm,
+          error: error.message,
+        });
+        console.log(error);
+      }
+      setScreens((currScreen) => currScreen + 1);
+    } catch (error) {
+      setAuthForm({
+        ...authForm,
+        error: error.message,
+      });
+      console.log(error);
+    }
+  }
 
   const FormComponents = () => {
     if (screen === 0) {
-      return <ProfileDetails form={form} setForm={setForm} />;
+      return <EmailAndPassword authForm={authForm} setAuthForm={setAuthForm} />;
     } else if (screen === 1) {
       return <IamA form={form} setForm={setForm} />;
     } else if (screen === 2) {
@@ -57,11 +99,9 @@ export default function Form() {
     } else if (screen === 3) {
       return <Interests form={form} setForm={setForm} />;
     } else if (screen === 4) {
-      return <Locate form={form} setForm={setForm} />;
-    } else if (screen === 5) {
       return <Bio form={form} setForm={setForm} />;
     } else {
-      return <MyPhotos form={form} setForm={setForm} />;
+      return <Locate form={form} setForm={setForm} />;
     }
   };
 
@@ -78,6 +118,25 @@ export default function Form() {
       return;
     } else {
       setScreens((currScreen) => currScreen - 1);
+    }
+  };
+
+  const onButtonSubmit = async () => {
+    try {
+      const id = user.uid;
+      await setDoc(
+        doc(db, "users", id),
+        {
+          ...form,
+        },
+        { merge: true }
+      );
+      navigation.navigate("Home");
+    } catch (error) {
+      setAuthForm({
+        ...authForm,
+        error: error.message,
+      });
     }
   };
 
@@ -98,10 +157,20 @@ export default function Form() {
       </View>
       <View>{FormComponents()}</View>
       <View style={{ bottom: 50, left: 70, position: "absolute" }}>
-        <Button
-          title={screen === FormTitles.length - 1 ? "Finish" : "Continue"}
-          onPress={onHandleNext}
-        />
+        {screen !== 0 ? (
+          <Button
+            title={screen === FormTitles.length - 1 ? "Finish" : "Continue"}
+            onPress={() => {
+              if (screen === FormTitles.length - 1) {
+                onButtonSubmit();
+              } else {
+                onHandleNext();
+              }
+            }}
+          />
+        ) : (
+          <Button title="Signup to continue" onPress={onSignUp} />
+        )}
       </View>
       {screen === 0 ? null : (
         <Pressable

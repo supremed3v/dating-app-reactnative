@@ -8,6 +8,10 @@ export default function Signup({ navigation }) {
   const onSignupWithEmail = () => {
     navigation.navigate("Form");
   };
+
+  const onSignIn = () => {
+    navigation.navigate("SignIn");
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -22,7 +26,7 @@ export default function Signup({ navigation }) {
       </View>
       <Button title="Signup with email" onPress={onSignupWithEmail} />
       <View style={{ marginTop: 10 }}>
-        <ButtonSecondary title="Signup with phone" />
+        <ButtonSecondary title="Sign In" onPress={onSignIn} />
       </View>
       <View
         style={{ flexDirection: "row", alignItems: "center", marginTop: 50 }}

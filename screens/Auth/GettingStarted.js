@@ -85,7 +85,7 @@ export default function GettingStarted({ navigation }) {
           </View>
         </Swiper>
         <View style={{ position: "absolute", bottom: 100 }}>
-          <Button title="Create an account" onPress={onSignUp} />
+          <Button title="Get Started!" onPress={onSignUp} />
         </View>
       </View>
     </>

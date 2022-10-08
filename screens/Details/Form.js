@@ -2,7 +2,11 @@ import { View, Text, Pressable } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import Button from "../../components/Button";
 import { Ionicons } from "@expo/vector-icons";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { getFirestore, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { ref, onValue, push, update, remove } from "firebase/database";
 
@@ -65,6 +69,9 @@ export default function Form({ navigation }) {
         authForm.email,
         authForm.password
       );
+      await updateProfile(res.user, {
+        displayName: authForm.displayName,
+      });
       try {
         await setDoc(doc(db, "users", res.user.uid), {
           uid: res.user.uid,

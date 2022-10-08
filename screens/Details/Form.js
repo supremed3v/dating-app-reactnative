@@ -29,7 +29,7 @@ export default function Form({ navigation }) {
     // Bio
     description: "",
 
-    location: null,
+    location: [],
   });
   const [authForm, setAuthForm] = useState({
     displayName: "",
@@ -72,20 +72,19 @@ export default function Form({ navigation }) {
           email: authForm.email,
           age: authForm.age,
         });
+        await setDoc(doc(db, "userChats", res.user.uid), {});
+        setScreens((currScreen) => currScreen + 1);
       } catch (error) {
         setAuthForm({
           ...authForm,
           error: error.message,
         });
-        console.log(error);
       }
-      setScreens((currScreen) => currScreen + 1);
     } catch (error) {
       setAuthForm({
         ...authForm,
         error: error.message,
       });
-      console.log(error);
     }
   }
 

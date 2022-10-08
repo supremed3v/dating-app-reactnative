@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "#f3f3f3",
+    elevation: 10,
+    shadowColor: "#000",
   },
   buttonText: {
     fontSize: 16,

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 export default function Locate({ form, setForm }) {
-  const [loc, setLoc] = useState({});
+  const [loc, setLoc] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
@@ -16,9 +16,9 @@ export default function Locate({ form, setForm }) {
 
       let myLocation = await Location.getCurrentPositionAsync({});
       setLoc(myLocation);
-      console.log(loc);
-      setForm({ ...form, location: { loc } });
     })();
+    setForm({ ...form, location: { loc } });
+    // console.log(loc);
   }, []);
   console.log(form);
   let text = "Waiting..";

@@ -16,6 +16,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 15,
+
+    elevation: 10,
+    shadowColor: "red",
   },
   buttonText: {
     fontSize: 16,

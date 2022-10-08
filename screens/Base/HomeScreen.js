@@ -41,7 +41,11 @@ export default function HomeScreen({ navigation }) {
       xhr.open("GET", image, true);
       xhr.send(null);
     });
-    const ref = firebase.storage().ref().child(`Pictures/Image1`);
+
+    const ref = firebase
+      .storage()
+      .ref()
+      .child(`Pictures/${user.displayName + Date.now()}`);
     const snapshot = ref.put(blob);
     snapshot.on(
       firebase.storage.TaskEvent.STATE_CHANGED,

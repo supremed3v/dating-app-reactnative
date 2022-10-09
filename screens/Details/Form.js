@@ -7,8 +7,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, onSnapshot } from "firebase/firestore";
-import { ref, onValue, push, update, remove } from "firebase/database";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 import { Bio, IamA, Interests, LookingFor } from "./formComponents";
 import Locate from "./formComponents/Location";
@@ -80,6 +79,13 @@ export default function Form({ navigation }) {
           age: authForm.age,
         });
         await setDoc(doc(db, "userChats", res.user.uid), {});
+        await setDoc(
+          doc(db, "users", res.user.uid),
+          {
+            photos: [],
+          },
+          { merge: true }
+        );
         setScreens((currScreen) => currScreen + 1);
       } catch (error) {
         setAuthForm({

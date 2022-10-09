@@ -15,11 +15,12 @@ import Form from "../screens/Details/Form";
 import { AuthContext } from "../context/AuthContext";
 import SignIn from "../screens/Auth/SignIn";
 import { Chat, HomeScreen, Liked, Profile } from "../screens/Base";
+import Gallery from "../components/Gallery";
 
 const MainStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const HomeStack = createBottomTabNavigator();
-const Auth = () => {
+const Auth = ({ navigation }) => {
   return (
     <AuthStack.Navigator>
       <AuthStack.Screen
@@ -46,7 +47,7 @@ const Auth = () => {
   );
 };
 
-const Home = () => {
+const Home = ({ navigation }) => {
   return (
     <HomeStack.Navigator
       options={{}}
@@ -123,7 +124,7 @@ const Home = () => {
   );
 };
 
-export default function MainStackNavigator() {
+export default function MainStackNavigator({ navigation }) {
   const { user } = useContext(AuthContext);
   return (
     <NavigationContainer>
@@ -133,6 +134,7 @@ export default function MainStackNavigator() {
       >
         <MainStack.Screen name="Auth" component={Auth} />
         <MainStack.Screen name="Home" component={Home} />
+        <MainStack.Screen name="Gallery" component={Gallery} />
       </MainStack.Navigator>
     </NavigationContainer>
   );

@@ -10,12 +10,11 @@ import {
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import firebase from "../../config/firebaseConfig";
 import Button from "../../components/Button";
 import * as ImagePicker from "expo-image-picker";
 
-export default function Profile() {
+export default function Profile({ navigation }) {
   const { user } = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -30,8 +29,8 @@ export default function Profile() {
       quality: 1,
     });
     if (!result.cancelled) {
-      setImages(result.uri);
-      console.log(images);
+      setImage(result.uri);
+      console.log(image);
     }
   };
 
@@ -39,59 +38,6 @@ export default function Profile() {
     let newImage = image.filter((img) => img.uri !== uri);
     setImage(newImage);
     console.log("pressed");
-  };
-
-  const handleUpload = async () => {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function () {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", image, true);
-      xhr.send(null);
-    });
-
-    const ref = firebase
-      .storage()
-      .ref()
-      .child(`Pictures/${user.displayName + Date.now()}`);
-    const snapshot = ref.put(blob);
-    snapshot.on(
-      firebase.storage.TaskEvent.STATE_CHANGED,
-      () => {
-        setUploading(true);
-      },
-      (error) => {
-        setUploading(false);
-        console.log(error);
-        blob.close();
-        return;
-      },
-      () => {
-        snapshot.snapshot.ref.getDownloadURL().then((url) => {
-          setUploading(false);
-          console.log("Download URL: ", url);
-          setImage(url);
-          blob.close();
-          return url;
-        });
-      }
-    );
-    try {
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          photos: image,
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
@@ -114,8 +60,12 @@ export default function Profile() {
         horizontal={true}
         keyExtractor={(item) => item.uri}
       />
-      <Button title={"Add Photos"} onPress={imagePicker} />
-      <Button title={"Upload"} onPress={handleUpload} />
+      {/* <Button title={"Add Photos"} onPress={imagePicker} />
+      <Button title={"Upload"} onPress={handleUpload} /> */}
+      <Button
+        title={"Gallery"}
+        onPress={() => navigation.navigate("Gallery")}
+      />
     </View>
   );
 }

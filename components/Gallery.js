@@ -1,22 +1,19 @@
-import { View, Text, Image, ActivityIndicator } from "react-native";
-import React, { useContext, useState, useEffect } from "react";
+import { View, Text, ActivityIndicator, Image, FlatList } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import firebase from "../config/firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
-import { AuthContext } from "../../context/AuthContext";
-import Button from "../../components/Button";
-import { signOut, updateProfile } from "firebase/auth";
-import { getAuth } from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
-import firebase from "../../config/firebaseConfig";
+import Button from "./Button";
 
-const auth = getAuth();
-const db = getFirestore();
-
-export default function HomeScreen({ navigation }) {
+export default function Gallery() {
   const { user } = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [profileData, setProfileData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    setLoading(false);
     const subcriber = firebase
       .firestore()
       .collection("users")
@@ -27,22 +24,22 @@ export default function HomeScreen({ navigation }) {
           setProfileData(documentSnapshot.data());
         }
       });
+    setLoading(true);
     return () => subcriber;
   }, []);
-  console.log(profileData);
-
-  const pickImage = async () => {
+  const imagePicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
       aspect: [4, 3],
+      allowsEditing: true,
       quality: 1,
     });
-    console.log(result);
     if (!result.cancelled) {
       setImage(result.uri);
+      console.log(image);
     }
   };
+
   const handleUpload = async () => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -84,55 +81,50 @@ export default function HomeScreen({ navigation }) {
       }
     );
     try {
-      await updateProfile(user, {
-        photoURL: image,
-      });
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          photoURL: image,
-        },
-        { merge: true }
-      );
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .update({
+          photos: firebase.firestore.FieldValue.arrayUnion(image),
+        });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const onSignOut = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log("Signed Out");
-        navigation.navigate("SignIn");
-      });
-  };
-
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Name:- {user?.displayName}</Text>
-      {user.photoURL === null ? (
-        <Text>Photo:- No photo</Text>
+    <View>
+      {loading === false ? (
+        <View>
+          <Text>Populating Data</Text>
+          <ActivityIndicator size={"large"} color={"#000"} />
+        </View>
       ) : (
-        <Text>Photo:- Available</Text>
-      )}
-      <View>
-        {!image ? (
-          <Button title={"Browse Image"} onPress={pickImage} />
-        ) : (
-          <Image
-            source={{ uri: user.photoURL }}
-            style={{ width: 200, height: 200 }}
+        <View>
+          <FlatList
+            data={profileData.photos}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={{ width: 100, height: 100 }}
+              />
+            )}
+            keyExtractor={(item) => item}
           />
-        )}
-        {!uploading ? (
-          <Button title={"Upload Image"} onPress={handleUpload} />
-        ) : (
-          <ActivityIndicator size="large" color="#0000ff" />
-        )}
-      </View>
-      <Button title={"Sign Out"} onPress={() => onSignOut()} />
+          <View style={{ marginTop: 50 }}>
+            <Button title={"Browse"} onPress={imagePicker} />
+            {image && (
+              <Image
+                source={{ uri: image.uri }}
+                style={{ width: 200, height: 200 }}
+              />
+            )}
+            <Button title={"Upload"} onPress={handleUpload} />
+          </View>
+          <Text>{profileData.sexInterest}</Text>
+        </View>
+      )}
     </View>
   );
 }

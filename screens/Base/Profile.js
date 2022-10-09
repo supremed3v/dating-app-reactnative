@@ -115,7 +115,7 @@ export default function Profile() {
         keyExtractor={(item) => item.uri}
       />
       <Button title={"Add Photos"} onPress={imagePicker} />
-      <Button title={"Upload"} onPress={() => handleUpload(images)} />
+      <Button title={"Upload"} onPress={handleUpload} />
     </View>
   );
 }

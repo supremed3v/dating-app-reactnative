@@ -22,7 +22,7 @@ const AuthStack = createNativeStackNavigator();
 const HomeStack = createBottomTabNavigator();
 const Auth = ({ navigation }) => {
   return (
-    <AuthStack.Navigator>
+    <AuthStack.Navigator initialRouteName="SignIn">
       <AuthStack.Screen
         name="GettingStarted"
         component={GettingStarted}

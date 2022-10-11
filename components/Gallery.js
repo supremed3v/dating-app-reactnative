@@ -1,16 +1,25 @@
-import { View, Text, ActivityIndicator, Image, FlatList } from "react-native";
+import { View, Text, ActivityIndicator, Image, Dimensions } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import firebase from "../config/firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
 import Button from "./Button";
+import { SwiperFlatList } from "react-native-swiper-flatlist";
+
+const { width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 export default function Gallery() {
-  const { user } = useContext(AuthContext);
+  const { user, userData } = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
   const [profileData, setProfileData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const onSelect = (selectedIndex) => {
+    setSelectedIndex(selectedIndex);
+  };
 
   useEffect(() => {
     setLoading(false);
@@ -36,7 +45,6 @@ export default function Gallery() {
     });
     if (!result.cancelled) {
       setImage(result.uri);
-      console.log(image);
     }
   };
 
@@ -71,59 +79,87 @@ export default function Gallery() {
         return;
       },
       () => {
-        snapshot.snapshot.ref.getDownloadURL().then((url) => {
-          setUploading(false);
-          console.log("Download URL: ", url);
-          setImage(url);
-          blob.close();
-          return url;
-        });
+        snapshot.snapshot.ref
+          .getDownloadURL()
+          .then((url) => {
+            console.log("Download URL: ", url);
+            setImageUrl(url);
+            setUploading(false);
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(user.uid)
+              .update({
+                photos: firebase.firestore.FieldValue.arrayUnion(imageUrl),
+              });
+            console.log("uploaded");
+            setUploading(false);
+          });
       }
     );
-    try {
-      await firebase
-        .firestore()
-        .collection("users")
-        .doc(user.uid)
-        .update({
-          photos: firebase.firestore.FieldValue.arrayUnion(image),
-        });
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, alignItems: "center" }}>
+      <Text style={{ color: "white" }}>Gallery</Text>
       {loading === false ? (
         <View>
-          <Text>Populating Data</Text>
+          <Text style={{ color: "white" }}>Populating Data</Text>
           <ActivityIndicator size={"large"} color={"#000"} />
         </View>
       ) : (
-        <View>
-          <FlatList
-            data={profileData.photos}
-            renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                style={{ width: 100, height: 100 }}
-              />
-            )}
-            keyExtractor={(item) => item}
-          />
-          <View style={{ marginTop: 50 }}>
-            <Button title={"Browse"} onPress={imagePicker} />
-            {image && (
-              <Image
-                source={{ uri: image.uri }}
-                style={{ width: 200, height: 200 }}
-              />
-            )}
-            <Button title={"Upload"} onPress={handleUpload} />
+        <>
+          <View style={{ width: width, height: 500 }}>
+            <SwiperFlatList
+              onChangeIndex={(index) => onSelect(index)}
+              autoplay={false}
+              showPagination
+              paginationActiveColor={"black"}
+              data={userData.photos}
+              renderItem={({ item, index }) => {
+                return (
+                  <View style={{ width: width, justifyContent: "center" }}>
+                    <Image
+                      key={index}
+                      source={{ uri: item }}
+                      style={{
+                        width: width,
+                        height: 400,
+                        resizeMode: "cover",
+                        borderRadius: 14,
+                      }}
+                    />
+                  </View>
+                );
+              }}
+            />
           </View>
-          <Text>{profileData.sexInterest}</Text>
-        </View>
+          {!image ? (
+            <View style={{ flex: 1 / 2, marginTop: 30 }}>
+              <Button title={"Post a photo"} onPress={imagePicker} />
+            </View>
+          ) : (
+            <View style={{ flex: 1 / 2, marginTop: 30 }}>
+              <Image
+                source={{ uri: image }}
+                style={{
+                  width: 100,
+                  height: 100,
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  marginBottom: 10,
+                }}
+              />
+              {uploading ? (
+                <ActivityIndicator size={"large"} color={"#000"} />
+              ) : (
+                <Text>Uploaded...</Text>
+              )}
+            </View>
+          )}
+        </>
       )}
     </View>
   );

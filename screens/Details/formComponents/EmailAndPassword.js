@@ -1,9 +1,5 @@
 import { View, Text, TextInput, Pressable, Platform } from "react-native";
 
-import DateTimePicker from "@react-native-community/datetimepicker";
-
-import { FontAwesome5 } from "@expo/vector-icons";
-
 import React, { useState, useEffect } from "react";
 
 export default function EmailAndPassword({ authForm, setAuthForm }) {
